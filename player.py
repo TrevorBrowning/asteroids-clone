@@ -8,6 +8,8 @@ class Player(CircleShape):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.cooldown = 0
+        self.boost_time = 0
+        self.boost_cooldown = 0
         
 
 
@@ -35,30 +37,63 @@ class Player(CircleShape):
         self.position += rotated_with_speed_vector
 
     
+    def speed_boost(self, dt):
+        unit_vector = pygame.Vector2(0, 1)
+        rotated_vector = unit_vector.rotate(self.rotation)
+        rotated_with_speed_vector = rotated_vector * PLAYER_BOOST_SPEED * dt
+        self.position += rotated_with_speed_vector
+
+    def try_boost(self):
+        if self.boost_cooldown > 0 or self.boost_time > 0:
+            return
+
+        self.boost_time = PLAYER_BOOST_LENGTH
+        self.boost_cooldown = PLAYER_BOOST_COOLDOWN
+
+
     def update(self, dt):
         keys = pygame.key.get_pressed()
 
+        
         if self.cooldown > 0:
             self.cooldown -= dt
             if self.cooldown < 0:
                 self.cooldown = 0
 
+      
         if keys[pygame.K_a]:
             self.rotate(-dt)
         if keys[pygame.K_d]:
             self.rotate(dt)
+
+       
         if keys[pygame.K_w]:
-            self.move(dt)
+            if self.boost_time > 0:
+                self.speed_boost(dt)
+            else:
+                self.move(dt)
+
         if keys[pygame.K_s]:
             self.move(-dt)
 
+       
         mouse_position = pygame.mouse.get_pos()
         mouse_vector = pygame.Vector2(mouse_position)
         mouse_diff = mouse_vector - self.position
-        ref_direction = pygame.Vector2(0,1)
-        rotation = ref_direction.angle_to(mouse_diff)
-        self.rotation = rotation
+        ref_direction = pygame.Vector2(0, 1)
+        self.rotation = ref_direction.angle_to(mouse_diff)
+
         
+        if self.boost_time > 0:
+            self.boost_time -= dt
+            if self.boost_time < 0:
+                self.boost_time = 0
+
+        if self.boost_cooldown > 0:
+            self.boost_cooldown -= dt
+            if self.boost_cooldown < 0:
+                self.boost_cooldown = 0
+
 
 
 

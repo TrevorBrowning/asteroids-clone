@@ -56,6 +56,8 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left mouse button
                     player.try_shoot()
+                elif event.button == 3:
+                    player.try_boost()
 
 
         updatable.update(dt)
