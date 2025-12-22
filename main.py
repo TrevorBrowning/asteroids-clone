@@ -6,6 +6,7 @@ from logger import log_state, log_event
 from player import Player
 from shot import Shot
 from ui import *
+from background import Background
 import sys
 
 
@@ -41,6 +42,10 @@ def main():
     # UI 
     ui = UI(screen, current_score)
 
+    # Background
+    background = Background(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
+
+
     while True:
         log_state()
 
@@ -69,8 +74,10 @@ def main():
                     asteroid.split()
                     asteroid.kill()
                     score_counter += 1
-
+        
+        
         screen.fill("black")
+        background.draw()
 
         for obj in drawable:
             obj.draw(screen)
