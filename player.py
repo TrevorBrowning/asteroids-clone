@@ -37,6 +37,7 @@ class Player(CircleShape):
     
     def update(self, dt):
         keys = pygame.key.get_pressed()
+
         if self.cooldown > 0:
             self.cooldown -= dt
             if self.cooldown < 0:
@@ -50,12 +51,25 @@ class Player(CircleShape):
             self.move(dt)
         if keys[pygame.K_s]:
             self.move(-dt)
-        if keys[pygame.K_SPACE]:
-            if self.cooldown > 0:
-                print("YOU CANT SHOOT")
-            else:
-                self.cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS
-                self.shoot()
+
+        mouse_position = pygame.mouse.get_pos()
+        mouse_vector = pygame.Vector2(mouse_position)
+        mouse_diff = mouse_vector - self.position
+        ref_direction = pygame.Vector2(0,1)
+        rotation = ref_direction.angle_to(mouse_diff)
+        self.rotation = rotation
+        
+
+
+
+    def try_shoot(self):
+        if self.cooldown > 0:
+            print("YOU CAN'T SHOOT")
+            return
+
+        self.cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS
+        self.shoot()
+
 
     def shoot(self):
         shot = Shot(self.position)

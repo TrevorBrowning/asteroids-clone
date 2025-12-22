@@ -38,6 +38,11 @@ def main():
             if event.type == pygame.QUIT:
                 return
 
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # Left mouse button
+                    player.try_shoot()
+
+
         updatable.update(dt)
 
     
