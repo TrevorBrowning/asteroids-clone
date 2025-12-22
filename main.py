@@ -5,6 +5,7 @@ from constants import SCREEN_HEIGHT, SCREEN_WIDTH
 from logger import log_state, log_event
 from player import Player
 from shot import Shot
+from ui import *
 import sys
 
 
@@ -31,6 +32,15 @@ def main():
 
     dt = 0
 
+    # Score System
+    score_counter = 0
+
+    def current_score():
+        return score_counter
+    
+    # UI 
+    ui = UI(screen, current_score)
+
     while True:
         log_state()
 
@@ -45,7 +55,8 @@ def main():
 
         updatable.update(dt)
 
-    
+        
+
         for asteroid in asteroids:
             if player.collides_with(asteroid):
                 log_event("player_hit")
@@ -57,11 +68,14 @@ def main():
                     log_event("asteroid_shot")
                     asteroid.split()
                     asteroid.kill()
+                    score_counter += 1
 
         screen.fill("black")
 
         for obj in drawable:
             obj.draw(screen)
+        
+        ui.draw()
 
         pygame.display.flip()
 
