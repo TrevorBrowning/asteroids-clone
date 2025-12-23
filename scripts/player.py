@@ -10,11 +10,24 @@ class Player(CircleShape):
         self.cooldown = 0
         self.boost_time = 0
         self.boost_cooldown = 0
+        self.invulnerable_time = 0
+        self.lives = PLAYER_LIVES
+        self.blink_timer = 0
+        
+        ### Audio ###
+        self.fire_sound = pygame.mixer.Sound("assets/sounds/fire.wav")
+
         
 
 
     def draw(self, screen):
+        if self.invulnerable_time > 0:
+            if int(self.blink_timer * 10) % 2 == 0:
+                return
+
         pygame.draw.polygon(screen, 'white', self.triangle(), LINE_WIDTH)
+
+
         
 
 
@@ -49,6 +62,7 @@ class Player(CircleShape):
 
         self.boost_time = PLAYER_BOOST_LENGTH
         self.boost_cooldown = PLAYER_BOOST_COOLDOWN
+        
 
 
     def update(self, dt):
@@ -94,6 +108,20 @@ class Player(CircleShape):
             if self.boost_cooldown < 0:
                 self.boost_cooldown = 0
 
+        if self.invulnerable_time > 0:
+            self.invulnerable_time -= dt
+        if self.invulnerable_time < 0:
+            self.invulnerable_time = 0
+
+        if self.invulnerable_time > 0:
+            self.blink_timer += dt
+        else:
+            self.blink_timer = 0
+
+
+        
+        
+
 
 
 
@@ -104,6 +132,9 @@ class Player(CircleShape):
 
         self.cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS
         self.shoot()
+        self.fire_sound.play()
+
+
 
 
     def shoot(self):
@@ -111,4 +142,27 @@ class Player(CircleShape):
         direction = pygame.Vector2(0, 1)
         direction = direction.rotate(self.rotation)
         shot.velocity = direction * PLAYER_SHOOT_SPEED
+    
+    
+    def take_damage(self):
+      
+        if self.invulnerable_time > 0:
+            return False
+
         
+        self.lives -= 1
+        self.invulnerable_time = PLAYER_VULNERABILITY_TIMER
+
+        print(f"Player hit! Lives left: {self.lives}")
+
+        return True
+
+    def current_lives():
+        return player.lives
+
+
+
+
+
+
+

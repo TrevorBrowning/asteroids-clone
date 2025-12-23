@@ -1,3 +1,7 @@
+import os
+#os.environ["SDL_AUDIODRIVER"] = "dummy"
+
+
 import pygame
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
@@ -12,6 +16,13 @@ import sys
 
 def main():
     pygame.init()
+    try:
+        pygame.mixer.init()
+        audio_enabled = True
+    except pygame.error:
+        print("Audio disabled (no sound device)")
+        audio_enabled = False
+
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
 
@@ -36,14 +47,20 @@ def main():
     # Score System
     score_counter = 0
 
+    def current_lives():
+        return player.lives
+
+
     def current_score():
         return score_counter
     
     # UI 
-    ui = UI(screen, current_score)
+    ui = UI(screen, current_score, current_lives)
 
     # Background
     background = Background(screen, SCREEN_WIDTH, SCREEN_HEIGHT)
+
+    
 
 
     while True:
@@ -66,16 +83,21 @@ def main():
 
         for asteroid in asteroids:
             if player.collides_with(asteroid):
-                log_event("player_hit")
-                print("Game Over")
-                sys.exit()
+                if player.take_damage():
+                    log_event("player_hit")
+
+                if player.lives <= 0:
+                    print("Game Over")
+                    sys.exit()
+
             
             for shot in shots:
+                
                 if shot.collides_with(asteroid):
                     log_event("asteroid_shot")
                     asteroid.split()
                     asteroid.kill()
-                    score_counter += 1
+                    score_counter += 25
         
         
         screen.fill("black")
@@ -90,7 +112,8 @@ def main():
 
         # limit the framerate to 60 FPS
         dt = clock.tick(60) / 1000
-
+        
+   
 
 if __name__ == "__main__":
     main()
